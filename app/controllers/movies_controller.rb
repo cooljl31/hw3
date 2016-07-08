@@ -1,5 +1,6 @@
 class MoviesController < ApplicationController
-
+  include MoviesHelper
+  
   def movie_params
     params.require(:movie).permit(:title, :rating, :description, :release_date)
   end
@@ -11,9 +12,25 @@ class MoviesController < ApplicationController
   end
 
   def index
-   @sort = params[:sort]
-   @movies = Movie.all.order(@sort)
+   @sort_type = ''
+   @movies =  Movie.all
+   @all_ratings = Movie.all_ratings
+  @selected_ratings = @all_ratings
+   
+   if params[:sort].present? 
+     sort_type = params[:sort]
+     sort_movies(sort_type)
+   end
+   
+   selected_filters = params[:ratings].try(:keys) || @all_ratings
+   @movies = @movies.where(rating: selected_filters)
+   
+   @selected_ratings = selected_filters
+   
+   
   end
+  
+  
 
   def new
     # default: render 'new' template
@@ -42,5 +59,8 @@ class MoviesController < ApplicationController
     flash[:notice] = "Movie '#{@movie.title}' deleted."
     redirect_to movies_path
   end
+  
 
+
+  
 end
