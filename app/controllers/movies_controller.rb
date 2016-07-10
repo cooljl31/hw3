@@ -14,19 +14,20 @@ class MoviesController < ApplicationController
   def index
     # byebug
    @all_ratings = Movie.all_ratings
-   session[:ratings] =  session[:ratings]
-   @sort = params[:sort]    || session[:sort]    || {}
-   @temp = params[:ratings] || session[:ratings] || {}
+   @sort = params[:sort]    || session[:sort]    
+   @temp = params[:ratings] || session[:ratings] 
 
   # Save @sort && @temp to a local variable
    session[:sort]    = @sort
    session[:ratings] = @temp
    
-    @movies = Movie.where(rating: session[:ratings].keys).order(session[:sort])
+   @selected = @temp == nil ? @all_ratings : @temp.keys
+
+   @movies = Movie.order(@sort).where({rating: @selected})
     
     if (params[:sort].nil? && !(session[:sort].nil?)) || (params[:ratings].nil? && !(session[:ratings].nil?))
       redirect_to movies_path(sort: session[:sort], ratings: session[:ratings])
-      session.delete(:ratings)
+      session.clear
     end
   end
   
