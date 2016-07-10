@@ -12,8 +12,9 @@ class MoviesController < ApplicationController
   end
 
   def index
+    # byebug
    @all_ratings = Movie.all_ratings
-   
+   session[:ratings] =  session[:ratings]
    @sort = params[:sort]    || session[:sort]    || {}
    @temp = params[:ratings] || session[:ratings] || {}
 
@@ -25,6 +26,7 @@ class MoviesController < ApplicationController
     
     if (params[:sort].nil? && !(session[:sort].nil?)) || (params[:ratings].nil? && !(session[:ratings].nil?))
       redirect_to movies_path(sort: session[:sort], ratings: session[:ratings])
+      session.delete(:ratings)
     end
   end
   
